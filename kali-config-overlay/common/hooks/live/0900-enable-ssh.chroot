@@ -1,0 +1,7 @@
+#!/bin/sh
+# Enable sshd so the live recovery stick can be reached over the network.
+if [ -e /lib/systemd/system/ssh.service ] || [ -e /usr/lib/systemd/system/ssh.service ]; then
+    systemctl enable ssh.service
+else
+    echo "W: openssh-server missing, ssh not enabled" >&2
+fi

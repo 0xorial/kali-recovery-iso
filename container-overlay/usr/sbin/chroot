@@ -1,0 +1,22 @@
+#!/bin/sh
+# Rosetta (binfmt) needs /proc/self/exe inside the chroot; ensure proc is
+# mounted in the target for the duration of the call, then unmount.
+d="$1"
+m=0
+case "$d" in -*|"") d="" ;; esac
+if [ -L "$d/proc" ]; then rm -f "$d/proc"; fi
+if [ -n "$d" ] && [ "$d" != "/" ] && ! mountpoint -q "$d/proc" 2>/dev/null; then
+    mkdir -p "$d/proc" 2>/dev/null
+    mount -t proc proc "$d/proc" 2>/dev/null && m=1
+fi
+/usr/sbin/chroot.real "$@"
+rc=$?
+if [ "$m" = 1 ]; then
+    n=0
+    while mountpoint -q "$d/proc" 2>/dev/null && [ $n -lt 5 ]; do
+        umount "$d/proc" 2>/dev/null || umount -l "$d/proc" 2>/dev/null || break
+        n=$((n+1))
+    done
+fi
+mountpoint -q "$d/proc" 2>/dev/null && echo "$(date +%T) LEFT-MOUNTED m=$m args=$*" >> /build/wrapper.log
+exit $rc
