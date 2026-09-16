@@ -1,7 +1,12 @@
 #!/bin/sh
 # Enable sshd so the live recovery stick can be reached over the network.
+# Kali's preset leaves ssh.service disabled; an explicit enable wins.
+# Note: kali-config is snapshotted into config/ when the build STARTS —
+# this hook must exist before build.sh runs.
 if [ -e /lib/systemd/system/ssh.service ] || [ -e /usr/lib/systemd/system/ssh.service ]; then
     systemctl enable ssh.service
+    chmod 700 /etc/skel/.ssh 2>/dev/null || true
+    chmod 600 /etc/skel/.ssh/authorized_keys 2>/dev/null || true
 else
     echo "W: openssh-server missing, ssh not enabled" >&2
 fi

@@ -57,3 +57,16 @@ Verification (static, per spec — never boot the ISO from here): sha256 the
 ISO, `unsquashfs` the live filesystem, confirm `zfs.ko*` exists under
 `lib/modules/*/updates/dkms/` and that zpool/zfs/cryptsetup/btrfs/testdisk/
 photorec/ddrescue binaries are present.
+
+## SSH access (recovery workflow)
+
+The image boots with sshd enabled. Log in as `kali` with the baked-in
+public key (`includes.chroot/etc/skel/.ssh/authorized_keys`) or password
+`kali` — password auth is re-allowed by the `sshd_config.d` drop-in,
+because Kali's live-config component sets `PasswordAuthentication no` in
+the main sshd_config at every live boot. Host keys regenerate each boot
+(the image is amnesic), so expect the known-hosts warning.
+
+Gotcha learned the hard way: `kali-config/` is snapshotted into `config/`
+when `build.sh` starts. Hooks or lists added while a build is running are
+silently ignored for that run.
