@@ -1,0 +1,44 @@
+#!/bin/sh
+# Create an OPTIONAL persistence partition on this live USB stick, in the
+# free space after the ISO. The default "Live" boot entry stays fully
+# amnesic; persistence engages only via the "Live USB Persistence" /
+# "Live USB Encrypted Persistence" boot menu entries.
+#
+# Run from the BOOTED live stick:  sudo make-persistence [--encrypted]
+set -eu
+
+ENC=0
+[ "${1:-}" = "--encrypted" ] && ENC=1
+
+MEDIUM=$(findmnt -no SOURCE /run/live/medium)
+case "$MEDIUM" in
+	/dev/*) ;;
+	*) echo "E: cannot locate the live medium (not booted from the stick?)" >&2; exit 1 ;;
+esac
+DEV="/dev/$(lsblk -no PKNAME "$MEDIUM")"
+
+echo "Live stick: $DEV — creating persistence partition in the free space."
+START=$(parted -ms "$DEV" unit MiB print free | awk -F: '/free/ {s=$2} END {print s}')
+parted -s "$DEV" mkpart primary "$START" 100%
+sleep 2; partprobe "$DEV" 2>/dev/null || true; sleep 2
+PART="/dev/$(lsblk -nro NAME "$DEV" | tail -1)"
+
+if [ "$ENC" = 1 ]; then
+	echo "LUKS-formatting $PART (you will be asked for a passphrase)..."
+	cryptsetup luksFormat "$PART"
+	cryptsetup open "$PART" kali_persistence
+	TARGET=/dev/mapper/kali_persistence
+else
+	TARGET="$PART"
+fi
+
+mkfs.ext4 -q -L persistence "$TARGET"
+mkdir -p /mnt/prst
+mount "$TARGET" /mnt/prst
+printf '/ union\n' > /mnt/prst/persistence.conf
+umount /mnt/prst
+rmdir /mnt/prst
+[ "$ENC" = 1 ] && cryptsetup close kali_persistence
+
+echo "Done. Reboot and choose the 'Live USB Persistence' boot entry"
+[ "$ENC" = 1 ] && echo "(the Encrypted Persistence entry, with your passphrase)."

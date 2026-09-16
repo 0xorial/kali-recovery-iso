@@ -70,6 +70,14 @@ because Kali's live-config component sets `PasswordAuthentication no` in
 the main sshd_config at every live boot. Host keys regenerate each boot
 (the image is amnesic), so expect the known-hosts warning.
 
+## Optional persistence
+
+The default boot entry is fully amnesic. To add opt-in persistence, boot
+the stick and run `sudo make-persistence` (or `--encrypted` for a LUKS
+container) — it creates a `persistence` partition in the stick's free
+space. From then on the "Live USB (Encrypted) Persistence" boot entries
+use it; the plain "Live" entry keeps ignoring it.
+
 Gotcha learned the hard way: `kali-config/` is snapshotted into `config/`
 when `build.sh` starts. Hooks or lists added while a build is running are
 silently ignored for that run.
