@@ -1,0 +1,61 @@
+name: build-iso
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'   # weekly, Monday 03:00 UTC — fresh kali-rolling packages
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      # The build peaks around 30GB; runners keep ~25GB free on / plus
+      # ~10GB of preinstalled toolchains we don't need.
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+
+      - name: Build and verify ISO in Kali container
+        run: |
+          mkdir -p out
+          docker run --rm --privileged \
+            -v "$PWD:/repo:ro" -v "$PWD/out:/out" \
+            kalilinux/kali-rolling bash -ec '
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y git live-build simple-cdd cdebootstrap curl squashfs-tools
+            git clone --depth 1 \
+              https://gitlab.com/kalilinux/build-scripts/live-build-config.git /build
+            cd /build
+            cat /repo/extra-packages.list >> kali-config/variant-xfce/package-lists/kali.list.chroot
+            cp -a /repo/kali-config-overlay/common/hooks/. kali-config/common/hooks/
+            cp -a /repo/kali-config-overlay/common/includes.chroot/. kali-config/common/includes.chroot/
+            ./build.sh --variant xfce --verbose
+
+            iso=$(ls images/*.iso)
+            sha256sum "$iso" | tee images/iso.sha256
+
+            # Static verification: fail the run rather than ship a broken image.
+            mkdir /tmp/m && mount -o loop,ro "$iso" /tmp/m
+            unsquashfs -l /tmp/m/live/filesystem.squashfs > /tmp/sq.list
+            grep -q "updates/dkms/zfs.ko" /tmp/sq.list
+            for b in zpool zfs cryptsetup btrfs testdisk photorec ddrescue sshd; do
+              grep -qE "s?bin/$b\$" /tmp/sq.list
+            done
+            grep -q "etc/systemd/system/multi-user.target.wants/ssh.service" /tmp/sq.list
+            grep -q "etc/skel/.ssh/authorized_keys" /tmp/sq.list
+            umount /tmp/m
+
+            cp "$iso" images/iso.sha256 /out/
+          '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kali-recovery-iso
+          path: out/
+          retention-days: 7

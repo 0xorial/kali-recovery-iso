@@ -1,0 +1,23 @@
+## Custom additions: filesystem + data-recovery tooling (forensics/recovery stick)
+zfsutils-linux
+zfs-dkms
+linux-headers-amd64
+btrfs-progs
+cryptsetup
+cryptsetup-bin
+lvm2
+mdadm
+testdisk
+gddrescue
+safecopy
+sleuthkit
+foremost
+extundelete
+e2fsprogs
+xfsprogs
+ntfs-3g
+exfatprogs
+smartmontools
+gdisk
+parted
+openssh-server

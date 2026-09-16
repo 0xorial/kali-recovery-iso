@@ -39,6 +39,9 @@ docker --context "$CTX" exec "$NAME" sh -c '
 '
 tar -C "$REPO_DIR/kali-config-overlay" -cf - . | docker --context "$CTX" exec -i "$NAME" \
     tar -C /build/live-build-config/kali-config -xf -
+docker --context "$CTX" exec -i "$NAME" sh -c \
+    'cat >> /build/live-build-config/kali-config/variant-xfce/package-lists/kali.list.chroot' \
+    < "$REPO_DIR/extra-packages.list"
 
 echo "Container ready. Build with:"
 echo "  docker --context $CTX exec -d $NAME sh -c 'cd /build/live-build-config && ./build.sh --variant xfce --verbose > /build/build.log 2>&1; echo \$? > /build/build.exit'"

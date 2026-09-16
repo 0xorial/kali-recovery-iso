@@ -20,12 +20,15 @@ and the fixes live in `container-overlay/`.
   blindly overwriting.
 - `kali-config-overlay/` — our image customizations, mirrored onto
   `live-build-config/kali-config/`:
-  - `variant-xfce/package-lists/kali.list.chroot` — full package list
-    (upstream's file + our additions at the bottom: ZFS, btrfs, LUKS, LVM,
-    mdadm, testdisk, ddrescue, sleuthkit, etc. + openssh-server). Note this
-    snapshots the upstream list too — diff against upstream when they drift.
   - `common/hooks/live/0900-enable-ssh.chroot` — enables sshd in the live
     image (login: kali/kali, host keys regenerate every boot).
+- `extra-packages.list` — our package additions (ZFS, btrfs, LUKS, LVM,
+  mdadm, testdisk, ddrescue, sleuthkit, etc. + openssh-server), appended to
+  upstream's current list at build time so upstream changes flow in.
+- `.github/workflows/build-iso.yml` — weekly CI build on GitHub's native
+  amd64 runners (no Rosetta patches needed there): applies this overlay,
+  builds, statically verifies (zfs.ko, tools, sshd enabled), uploads the
+  ISO as a 7-day artifact. Free on a public repo.
 
 ## Why each patch (Rosetta on Apple Silicon)
 
