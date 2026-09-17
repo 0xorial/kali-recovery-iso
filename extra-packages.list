@@ -42,3 +42,5 @@ rkhunter
 chkrootkit
 nvme-cli
 lshw
+## Platform/firmware inspection
+tpm2-tools
