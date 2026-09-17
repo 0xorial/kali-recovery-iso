@@ -1,0 +1,6 @@
+#!/bin/sh
+# volatility3 is missing from kali-rolling amd64 (2026-09); bake it from
+# PyPI at build time so the stick needs no field downloads. Drop this hook
+# once the apt package returns.
+pip install --break-system-packages volatility3
+vol --help > /dev/null

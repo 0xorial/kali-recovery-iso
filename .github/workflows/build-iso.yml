@@ -52,6 +52,7 @@ jobs:
             unsquashfs -l /tmp/m/live/filesystem.squashfs > /tmp/sq.list
             grep -q "updates/dkms/zfs.ko" /tmp/sq.list
             grep -q "updates/dkms/lime" /tmp/sq.list
+            grep -qE "local/bin/vol$" /tmp/sq.list
             for b in zpool zfs cryptsetup btrfs testdisk photorec ddrescue sshd; do
               grep -qE "s?bin/$b\$" /tmp/sq.list
             done

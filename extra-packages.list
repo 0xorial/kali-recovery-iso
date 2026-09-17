@@ -22,8 +22,8 @@ gdisk
 parted
 openssh-server
 ## Forensics additions (memory, timelines, E01/AFF, Windows artifacts, AV, hw)
-# volatility3  # absent from kali-rolling amd64 index 2026-09-17 (arm64 has it; transient archive gap — re-add when it returns)
-# lime-forensics  # absent from kali-rolling amd64 index 2026-09-17 (same transient gap as volatility3 — re-add when it returns)
+# volatility3: not in kali-rolling amd64 — baked from PyPI via hooks/live/0910-volatility3.chroot instead
+lime-forensics-dkms
 plaso
 regripper
 ewf-tools
