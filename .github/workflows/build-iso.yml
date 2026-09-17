@@ -18,7 +18,12 @@ jobs:
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/boost
-          df -h /
+          # kali-linux-large needs ~50GB inside docker; / can't hold it, /mnt can.
+          sudo systemctl stop docker
+          sudo mkdir -p /mnt/docker
+          echo '{"data-root": "/mnt/docker"}' | sudo tee /etc/docker/daemon.json
+          sudo systemctl start docker
+          df -h / /mnt
 
       - name: Build and verify ISO in Kali container
         run: |
@@ -32,6 +37,8 @@ jobs:
             git clone --depth 1 \
               https://gitlab.com/kalilinux/build-scripts/live-build-config.git /build
             cd /build
+            # Throwaway runner: keeping downloaded .debs only wastes peak disk.
+            sed -i "s/^lb config noauto/lb config noauto --cache-packages false/" auto/config
             cat /repo/extra-packages.list >> kali-config/variant-xfce/package-lists/kali.list.chroot
             cp -a /repo/kali-config-overlay/common/hooks/. kali-config/common/hooks/
             cp -a /repo/kali-config-overlay/common/includes.chroot/. kali-config/common/includes.chroot/

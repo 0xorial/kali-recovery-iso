@@ -22,8 +22,8 @@ gdisk
 parted
 openssh-server
 ## Forensics additions (memory, timelines, E01/AFF, Windows artifacts, AV, hw)
-volatility3
-lime-forensics
+# volatility3  # absent from kali-rolling amd64 index 2026-09-17 (arm64 has it; transient archive gap — re-add when it returns)
+# lime-forensics  # absent from kali-rolling amd64 index 2026-09-17 (same transient gap as volatility3 — re-add when it returns)
 plaso
 regripper
 ewf-tools
@@ -44,3 +44,6 @@ nvme-cli
 lshw
 ## Platform/firmware inspection
 tpm2-tools
+## Superset metapackages: pentest-large + full forensics category
+kali-linux-large
+kali-tools-forensics
