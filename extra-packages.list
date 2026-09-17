@@ -21,3 +21,24 @@ smartmontools
 gdisk
 parted
 openssh-server
+## Forensics additions (memory, timelines, E01/AFF, Windows artifacts, AV, hw)
+volatility3
+lime-forensics
+plaso
+regripper
+ewf-tools
+afflib-tools
+xmount
+dc3dd
+dcfldd
+ssdeep
+dislocker
+libvshadow-utils
+pff-tools
+python3-evtx
+clamav
+yara
+rkhunter
+chkrootkit
+nvme-cli
+lshw
