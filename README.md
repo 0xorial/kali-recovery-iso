@@ -37,7 +37,7 @@ stick is erased.
 
    ```
    diskutil unmountDisk /dev/diskN
-   sudo dd if=kali-linux-<version>-live-xfce-amd64.iso of=/dev/rdiskN bs=4m status=progress
+   sudo dd if=kali-linux-rolling-live-xfce-amd64.iso of=/dev/rdiskN bs=4m status=progress
    ```
 
    When `dd` finishes, macOS reports the disk as unreadable. That's
@@ -132,7 +132,7 @@ way.
 
 CI runs every Monday at 03:00 UTC and on demand
 (`gh workflow run build-iso -R 0xorial/kali-recovery-iso`). The artifact
-holds `kali-linux-<version>-live-xfce-amd64.iso` and `iso.sha256`.
+holds `kali-linux-rolling-live-xfce-amd64.iso` and `iso.sha256`.
 
 Verification is static: the ISO is never booted during the build. CI mounts
 the ISO, lists the live filesystem, and fails the run unless all of these
