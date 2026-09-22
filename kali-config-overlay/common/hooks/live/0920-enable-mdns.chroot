@@ -1,0 +1,4 @@
+#!/bin/sh
+# Kali's systemd preset leaves network-facing services disabled; enable
+# avahi so the stick answers as <hostname>.local (ssh kali@kali.local).
+systemctl enable avahi-daemon.service

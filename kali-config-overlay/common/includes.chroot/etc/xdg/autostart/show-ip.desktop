@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Show SSH address
+Exec=/usr/local/bin/show-ip
+NoDisplay=true

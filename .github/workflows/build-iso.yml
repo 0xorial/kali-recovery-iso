@@ -60,6 +60,9 @@ jobs:
             done
             grep -q "etc/systemd/system/multi-user.target.wants/ssh.service" /tmp/sq.list
             grep -q "etc/skel/.ssh/authorized_keys" /tmp/sq.list
+            grep -q "etc/systemd/system/multi-user.target.wants/avahi-daemon.service" /tmp/sq.list
+            grep -q "etc/xdg/autostart/show-ip.desktop" /tmp/sq.list
+            grep -q "etc/issue.d/ssh-address.issue" /tmp/sq.list
             umount /tmp/m
 
             cp "$iso" output/iso.sha256 /out/

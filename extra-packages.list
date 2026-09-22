@@ -47,3 +47,6 @@ tpm2-tools
 ## Superset metapackages: pentest-large + full forensics category
 kali-linux-large
 kali-tools-forensics
+## Find the stick on the network: ssh kali@kali.local (mDNS) + IP shown on screen
+avahi-daemon
+zenity
