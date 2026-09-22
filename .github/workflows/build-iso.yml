@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The build peaks around 30GB; runners keep ~25GB free on / plus
       # ~10GB of preinstalled toolchains we don't need.
@@ -42,10 +42,12 @@ jobs:
             cat /repo/extra-packages.list >> kali-config/variant-xfce/package-lists/kali.list.chroot
             cp -a /repo/kali-config-overlay/common/hooks/. kali-config/common/hooks/
             cp -a /repo/kali-config-overlay/common/includes.chroot/. kali-config/common/includes.chroot/
-            ./build.sh --variant xfce --verbose
+            # Upstream build.sh (rewritten 2026-09-21): verbosity is the DEBUG
+            # env var, and the ISO lands in output/ with a versioned name.
+            DEBUG=1 ./build.sh --variant xfce
 
-            iso=$(ls images/*.iso)
-            sha256sum "$iso" | tee images/iso.sha256
+            iso=$(ls output/*.iso)
+            (cd output && sha256sum "$(basename "$iso")") | tee output/iso.sha256
 
             # Static verification: fail the run rather than ship a broken image.
             mkdir /tmp/m && mount -o loop,ro "$iso" /tmp/m
@@ -60,10 +62,10 @@ jobs:
             grep -q "etc/skel/.ssh/authorized_keys" /tmp/sq.list
             umount /tmp/m
 
-            cp "$iso" images/iso.sha256 /out/
+            cp "$iso" output/iso.sha256 /out/
           '
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: kali-recovery-iso
           path: out/
