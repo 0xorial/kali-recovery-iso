@@ -1,8 +1,8 @@
 #!/bin/sh
 # Create an OPTIONAL persistence partition on this live USB stick, in the
-# free space after the ISO. The default "Live" boot entry stays fully
-# amnesic; persistence engages only via the "Live USB Persistence" /
-# "Live USB Encrypted Persistence" boot menu entries.
+# free space after the ISO. "Live system" and "Live system (forensic mode)"
+# stay fully amnesic; persistence engages only via the "Live system with USB
+# persistence" / "Live system with USB encrypted persistence" boot entries.
 #
 # Run from the BOOTED live stick:  sudo make-persistence [--encrypted]
 set -eu
@@ -40,5 +40,8 @@ umount /mnt/prst
 rmdir /mnt/prst
 [ "$ENC" = 1 ] && cryptsetup close kali_persistence
 
-echo "Done. Reboot and choose the 'Live USB Persistence' boot entry"
-[ "$ENC" = 1 ] && echo "(the Encrypted Persistence entry, with your passphrase)."
+if [ "$ENC" = 1 ]; then
+	echo "Done. Reboot and choose 'Live system with USB encrypted persistence'."
+else
+	echo "Done. Reboot and choose 'Live system with USB persistence'."
+fi

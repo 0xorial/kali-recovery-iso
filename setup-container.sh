@@ -5,7 +5,10 @@
 #
 # Prereq (asks for ~8GB RAM / 80GB disk):
 #   colima start --profile kali --vm-type vz --vz-rosetta --cpu 8 --memory 8 --disk 80
-# Undo everything: colima delete -p kali
+# Undo everything (colima delete alone leaves the VM's data disk behind):
+#   colima delete -p kali
+#   LIMA_HOME=~/.colima/_lima limactl disk delete colima-kali
+#   rm -f ~/.colima/_store/colima-kali.json
 set -eu
 CTX="colima-kali"
 NAME="kali-iso-builder"
@@ -44,5 +47,6 @@ docker --context "$CTX" exec -i "$NAME" sh -c \
     < "$REPO_DIR/extra-packages.list"
 
 echo "Container ready. Build with:"
-echo "  docker --context $CTX exec -d $NAME sh -c 'cd /build/live-build-config && ./build.sh --variant xfce --verbose > /build/build.log 2>&1; echo \$? > /build/build.exit'"
+echo "  docker --context $CTX exec -d $NAME sh -c 'cd /build/live-build-config && DEBUG=1 ./build.sh --variant xfce > /build/build.log 2>&1; echo \$? > /build/build.exit'"
 echo "  docker --context $CTX exec $NAME tail -f /build/build.log"
+echo "ISO lands in /build/live-build-config/output/"

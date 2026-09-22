@@ -1,2 +1,5 @@
 *.iso
 *.log
+.DS_Store
+artifact*/
+kali-iso/
